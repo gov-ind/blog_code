@@ -40,7 +40,7 @@ export const data = [
   //{ Page: Wrapper(Pico2021), route: '/picoctf_2021', title: 'PicoCTF 2021' },
   //{ Page: Wrapper(UT2021), route: '/utctf_2021', title: 'UTCTF 2021' },
   
-  //{ Page: Wrapper(ANN_1_RPD), type: 'post', route: '/ann_1_rpd', title: 'ANN Algorithms Part 1: KD Trees and RPDs', cat: ['ml', 'stats'], 'date': '11/05/2023' },
+  { Page: Wrapper(ANN_1_RPD), type: 'post', route: '/ann_1_rpd', title: 'ANN Algorithms Part 1: KD Trees and RPDs', cat: ['ml', 'stats'], 'date': '11/05/2023' },
   { Page: Wrapper(Wasserstein), type: 'post', route: '/wasserstein_distance', title: 'The Wasserstein Distance For Dummies', cat: ['ml', 'stats'], 'date': '11/05/2023' },
   { Page: Wrapper(QDP), type: 'post', route: '/qdp', title: 'Q-Values, Dynamic Programming, And The Bellman Equation', cat: ['ml', 'rl'], 'date': '08/05/2023' },
   { Page: Wrapper(AdvDTree), type: 'post', route: '/gradientless_ae', title: 'Adversarial Examples Against Gradientless Models', cat: ['ml'], 'date': '30/04/2023' },

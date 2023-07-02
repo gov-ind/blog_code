@@ -10,7 +10,7 @@ export default props => {
   return (
     <div className={cls}>
       <h1 className='page-title'>{props.title}</h1>
-      <div style={{ 'display': 'flex', 'alignItems': 'center' }}>
+      <div className='page-title-extras'>
         {props.date ?
           <>
             <FontAwesomeIcon icon={faCalendar} className='calendar-icon' />

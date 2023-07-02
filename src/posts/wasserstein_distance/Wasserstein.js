@@ -50,7 +50,7 @@ const options = {
     categoryPercentage: 1,
 };
 
-const ChartComponent = ({ labels, data1, data2 }) => {debugger;
+const ChartComponent = ({ labels, data1, data2 }) => {
     const data = {
         labels,
         datasets: [
@@ -86,7 +86,7 @@ function calculateCumulativeDistribution(arr1, arr2) {
     return [uniqueValues, cdf1, cdf2];
 }
 
-function calculateWorkDoneArray(originalNums1, nums1, originalNums2, nums2) {debugger;
+function calculateWorkDoneArray(originalNums1, nums1, originalNums2, nums2) {
   const n = Math.max(originalNums1.length, originalNums2.length);
   let workDoneArray = [];
   let workDone = 0;
