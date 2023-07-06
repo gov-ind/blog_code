@@ -1,6 +1,6 @@
 import { faChevronLeft, faChevronRight, faRepeat } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { Button } from '@material-ui/core';
 import Title from '../../Title';
@@ -18,7 +18,14 @@ const pageMap = {
     5: 97,
     6: 125,
     7: 136,
-    8: 82
+    8: 153,
+    9: 164,
+    10: null,
+    11: 199,
+    12: 206,
+    13: 212,
+    14: 223,
+    15: 246
 };
 const pages = {
   0: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
@@ -42,7 +49,7 @@ const pages = {
     One way to speed things up is to use a binary search. We can recursively partition our dataset in two, effectively creating a binary tree. We could partition till our tree reaches a certain depth - like I have here, with a tree depth of 2 - or till each leaf node has only a handful of points - like Annoy does, although it uses something more sophisticated than a binary tree (More on this soon).
     </p>
     <p>
-    To find the nearest neighbour(s), we start by traversing the tree starting at the root node in the middle. The red point is to the left of this node, so we traverse to the left child node, and in the process, ignoring all the points to the right of the root node. We repeat this process till we reach a leaf node, at which stage we only have a few points to compare with. In all, we had to make 7 distance calculations (2 for each tree node and 5 at the leaf node), so it's quite a significant optimization. However, if the distribution of the points were different, a binary search won't be as effecient. 
+    To find the nearest neighbour(s), we start by traversing the tree starting at the root node in the middle. The red point is to the left of this node, so we move to the left child node, and in the process, ignore all the points to the right of the root node. We repeat this process till we reach a leaf node, at which stage we only have a few points to compare with. In all, we had to make 7 distance calculations (2 for each tree node and 5 at the leaf node), so it's quite a significant optimization. However, if the distribution of the points were different, a binary search won't be as effecient. 
     </p>
   </div>,
   3: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
@@ -77,7 +84,7 @@ const pages = {
     As before, we start by calculating the two centroids of the data and separating them with an orthogonal hyperplane (here, a line) midway between the centroids.
   </p>
 </div>,
-  12: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
+  7: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
     <p>
       After we recursively partition each sub-cluster (until we reach a stopping condition, here, a tree depth of 2 again), we should end up with a bunch of centroids that we'll traverse in our nearest neighbour(s) search.
     </p>
@@ -85,15 +92,15 @@ const pages = {
       Note how at each partition, the two centroids capture the direction with the maximum variance. Here, the first partition near the origin correctly identifies the 45 degree diagonal along which data is spread. However, later partition are more or less arbitrary as there isn't much of a clear pattern in the sub-clusters.
     </p>
   </div>,
-  13: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
+  8: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
     <p>
-      Now that we have all our nodes, let's erase the splits and instead draw paths between each parent node and its children. To find the nearest neighbours of the orange dot, we'll have to start at the root node and traverse these paths using some sort of strategy.
+      Now that we have all our nodes, we can find the nearest neighbours of the orange dot by starting at the root node and traversing the paths to each node using some sort of strategy.
     </p>
     <p>
       The simplest strategy is to greedily traverse the path to the child node that is the closest to the orange dot. Here, the top-right node is closer, so we move there. The next hop will be to the node located to its top-left. Once there, we can conclude our search by finding the closest points to the orange dot in just that cluster.
     </p>
   </div>,
-  14: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
+  9: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
     <p>
       Unfortunately, the greedy search only worked because of the symmetricity of our data. If it were skewed such that each cluster had contrasting covariances, there's no way for our tree to account for each all the directions of variance at each split.
     </p>
@@ -104,7 +111,7 @@ const pages = {
       A greedy search would naively start off by exploring the wrong split and eventually conclude that one of the points in the right cluster is the nearest to the orange dot.
     </p>
   </div>,
-  15: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
+  10: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
     <p>
       The position of the orange dot isn't necessarily an outlier. As it turns out, by the curse of dimensionality, it becomes easier to find such "outliers" as the number of dimensions increase.
     </p>
@@ -112,7 +119,7 @@ const pages = {
       Another way to think about this is as follows: For 2-dimensional data, we need at least 4 data samples for a KD-Tree to be effective. In other words, for n-dimensional data, since each node splits the data in two, we need at least <Tex>2^n</Tex> data samples to see any performance gains. So unless you've got <Tex>{eq1}</Tex> samples, a KD-Tree isn't going to capture the geometry of your 40-dimensional data very well.
     </p>
   </div>,
-  16: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
+  11: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
     <p>
       Back to the problem: Our splits were unoptimal, so a greedy search wouldn't yield the closest neighbour. What we want to do instead is traverse the right node first but also keep the left node in a queue as a low priority node that we intend on exploring later on. We can then run a priority-based Breadth-First Search, something like Djikstra's algorithm, to find the shortest path from the root node to a cluster centroid that's nearest to the orange dot.
     </p>
@@ -120,23 +127,33 @@ const pages = {
       Here's how this would proceed: First, travel to both the children of the root node and push both of them into a queue, with the right node being pushed first as it's closer to the orange dot.
     </p>
   </div>,
-  17: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
+  12: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
     <p>
-      Next, pop the first node (here, the right node) off the queue and traverse each of its children, pushing each into the queue, which, remember, already has the left node.
+      Next, pop the first node (here, the right node) off the queue and traverse each of its children, pushing each into the queue, which, recall, already has the left node.
     </p>
     <p>
       Depending on its distance from the orange dot, one of these children will be placed ahead of the right node while the other will be placed after it. In either case, we only intend on exploring up to a depth of two for this toy example, so we won't be exploring further from these two node.
     </p>
-  </div>,
-  18: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
     <p>
-      This means that the only depth-1 node to explore is the right node. Once each of its children are traversed, the search is done, and we'll find that one of its children is the (rightfully) the closest to the orange dot.
+      Consequently, the only depth-1 node to explore is the right node. Once each of its children are traversed, the search is done, and we'll find that one of its children is (rightfully) the closest to the orange dot.
     </p>
   </div>,
+  13: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
+    <p>
+      Note that the complexity of this algorithm depends on the quality of our partitions. Had we been luckier with our first partition, we would've had to search through only two nodes instead of three. Is there any way to improve our luck? Perhaps if we make multiple sets of partitions, or in other words, a forest of KD-Trees, there's a good chance of at least one tree being "good".
+    </p>
+  </div>,
+  14: <div className='p-r-1 full' style={{ overflowY: 'auto' }}>
+    <p>
+      These KD-Tree forests, also called Random Projection Trees (RP-Trees), are what Annoy and FLANN use. For each tree in the RP-Tree, you could either choose the location of the partition to be random or add a bit of jitter to a partition that divides the subspace in two (like FLANN does).
+    </p>
+    <p>
+      One of these trees will lead to the nearest neighbour(s) of the target point. To find this tree, we can traverse each tree in parallel using our previous algorithm, except we add each child node to a shared priority queue. How long do we traverse? That depends on whether we want better recall or a faster lookup: The more we're willing to wait, the closer our discovered neighbour will be.
+    </p>
+  </div>
 }
 const mnPage = 0;
-const mxPage = Object.keys(pages).length + 1;
-const videoLen = 84;
+const mxPage = Object.keys(pages).length - 1;
 let existingIntervals = {};
 
 function clearExistingIntervals() {
@@ -158,49 +175,35 @@ function checkTime(videoRef, endTime) {
   }
 }
 
-const goToNext = (activePage, setActivePage, videoRef) => {//debugger;
+const goToNext = (activePage, setActivePage) => {
   if (activePage < mxPage && activePage in pageMap) {
     activePage++;
     setActivePage(activePage);
-
-    /*if (pageMap[activePage]) {
-      videoRef.current.currentTime = pageMap[activePage];
-      videoRef.current.play();
-
-      clearExistingIntervals();
-      checkTime(videoRef, getNextPageTime(activePage));
-    }*/
   }
 }
 
-const goToPrev = (activePage, setActivePage, videoRef) => {
+const goToPrev = (activePage, setActivePage) => {
   if (activePage > mnPage && activePage in pageMap) {
     activePage--;
     setActivePage(activePage);
-
-    /*if (pageMap[activePage]) {
-      videoRef.current.currentTime = pageMap[activePage];
-      videoRef.current.play();
-
-      clearExistingIntervals();
-      checkTime(videoRef, getNextPageTime(activePage));
-    }*/
   }
 }
 
 const getNextPageTime = page => {
-  while (!pageMap[++page] && page < mxPage);
-  if (page == mxPage) return videoLen;
+  while (!pageMap[++page] && page <= mxPage);
+  //if (page == mxPage) return videoLen;
   return pageMap[page];
 }
 
 const getPageTime = page => {
-  while (!pageMap[page] && page > 0) page--;
+  //while (!pageMap[page] && page > 0) page--;
   return pageMap[page];
 }
 
 const replay = (activePage, videoRef) => {
-  videoRef.current.currentTime = getPageTime(activePage);
+  const currPageTime = getPageTime(activePage);
+  if (!currPageTime) return;
+  videoRef.current.currentTime = currPageTime;
   videoRef.current.play();
   clearExistingIntervals();
   checkTime(videoRef, getNextPageTime(activePage));
@@ -214,7 +217,7 @@ const ANN = props => {
     if (videoRef.current) {
       replay(activePage, videoRef)
     }
-  }, [activePage, videoRef.current]);
+  }, [activePage]);
   
   return (
     <div style={{ display: 'flex', flexDirection: 'column', 'flex': 1 }}>
@@ -234,13 +237,13 @@ const ANN = props => {
         </div>
       </div>
       <div className='row h-3em justify-content-space-between' style={{ borderTop: 'solid 2px #3b4d61', boxShadow: '0px -10px 14px -12px #3b4d61' }}>
-            <Button className='full' onClick={() => goToPrev(activePage, setActivePage, videoRef)}>
+            <Button className='full' onClick={() => goToPrev(activePage, setActivePage)}>
               <FontAwesomeIcon icon={faChevronLeft}/>
             </Button>
             <Button className='full' onClick={() => replay(activePage, videoRef)}>
               <FontAwesomeIcon icon={faRepeat}/>
             </Button>
-            <Button className='full' onClick={() => goToNext(activePage, setActivePage, videoRef)}>
+            <Button className='full' onClick={() => goToNext(activePage, setActivePage)}>
               <FontAwesomeIcon icon={faChevronRight}/>
             </Button>
           </div>
