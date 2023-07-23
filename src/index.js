@@ -3,19 +3,14 @@ import ReactDOM from 'react-dom'
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
-  Link,
-  useLocation
+  Route
 } from "react-router-dom";
 import { Header } from './Header';
-import Pico2021 from './Pico2021';
-import UT2021 from './UT2021';
 import BabySign from './BabySign/BabySign';
 import Lunch from './Lunch/Lunch';
 import PickledOnions from './PickledOnions/PickledOnions';
 import Sub from './Sub/Sub';
 import MLHack from './MLHack/MLHack';
-import Cheapest from './Cheapest/Cheapest';
 import Beaver from './Beaver/Beaver';
 import HSCTF from './HSCTF/HSCTF';
 import OCR from './Google/OCR';
@@ -28,26 +23,21 @@ import './index.css'
 import Home from './Home';
 import About from './About/About';
 
-import { Provider } from 'react-redux';
 import QDP from './posts/q_dp/QDP';
-//import store from './store';
 
 const Wrapper = Page => props =>
     <Page {...props} />;
 
 export const data = [
   { Page: Wrapper(Home), route: '/', title: 'Home' },
-  //{ Page: Wrapper(Pico2021), route: '/picoctf_2021', title: 'PicoCTF 2021' },
-  //{ Page: Wrapper(UT2021), route: '/utctf_2021', title: 'UTCTF 2021' },
   
-  { Page: Wrapper(ANN_1_RPD), type: 'post', route: '/ann_1_rpd', title: 'ANN Algorithms Part 1: KD Trees and RP Trees', cat: ['ml', 'stats'], 'date': '11/05/2023' },
+  { Page: Wrapper(ANN_1_RPD), type: 'post', route: '/ann_1_rpd', title: 'ANN Algorithms Part 1: K-D Trees and RP Trees', cat: ['ml', 'algo'], 'date': '24/07/2023' },
   { Page: Wrapper(Wasserstein), type: 'post', route: '/wasserstein_distance', title: 'The Wasserstein Distance For Dummies', cat: ['ml', 'stats'], 'date': '11/05/2023' },
   { Page: Wrapper(QDP), type: 'post', route: '/qdp', title: 'Q-Values, Dynamic Programming, And The Bellman Equation', cat: ['ml', 'rl'], 'date': '08/05/2023' },
   { Page: Wrapper(AdvDTree), type: 'post', route: '/gradientless_ae', title: 'Adversarial Examples Against Gradientless Models', cat: ['ml'], 'date': '30/04/2023' },
   { Page: Wrapper(OCR), route: '/ocr_2022', title: 'OCR Write-up', cat: ['gctf', 'misc', 'ml'], 'date': '03/07/2022' },
   { Page: Wrapper(HSCTF), route: '/hsctf_2022', title: 'HSCTF 2022 Algo Write-ups', cat: ['hsctf', 'algo'], 'date': '11/06/2022' },
   { Page: Wrapper(Beaver), route: '/beaver_feaver_2022', title: 'Beaver Feaver Write-up', cat: ['secfest', 'rev'], 'date': '02/06/2022' },
-  //{ Page: Wrapper(Cheapest), route: '/cheapest_cookies_2022', title: 'Cheapest Cookies 2 Write-up / The Path To Djikstra\'s Algorithm', cat: ['tjctf', 'algo'], 'date': '15/04/2022' },
   { Page: Wrapper(MLHack), type: 'post', route: '/mlhack_2022', title: 'Side Channels in ML Hackathon Leaderboards', cat: ['misc'], 'date': '24/04/2022' },
   { Page: Wrapper(PickledOnions), route: '/pickled_onions_redpwn_2021', title: 'Pickled Onions Write-up', cat: ['redpwn', 'rev'], 'date': '13/07/2021' },
   { Page: Wrapper(Sub), route: '/the_substitution_game_redpwn_2021', title: 'The Substitution Game Write-up', cat: ['redpwn', 'algo'], 'date': '13/07/2021' },

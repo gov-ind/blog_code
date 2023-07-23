@@ -736,3 +736,7 @@ nav {
 .ann-rpd-video {
   clip-path: inset(1px 1px);
 }
+
+.ann-rpd-sidepanel {
+  overflow: auto;
+}
