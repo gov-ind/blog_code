@@ -223,10 +223,10 @@ const ANN = props => {
         <div className='ann-rpd-transcription'>
           {pages[activePage]}
         </div>
-        <div className='ann-rpd-video'>
+        <div className='ann-rpd-video-container'>
           <video
             ref={videoRef}
-            className='w-100pc h-75pc'
+            className='w-100pc h-75pc ann-rpd-video'
             muted='muted'
           >
             <source src={video} type="video/mp4" />

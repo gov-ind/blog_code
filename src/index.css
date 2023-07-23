@@ -648,7 +648,7 @@ nav {
   flex: 1;
 }
 
-.ann-rpd-video {
+.ann-rpd-video-container {
   display: flex;
   flex: 1;
   margin-left: 1em;
@@ -728,7 +728,11 @@ nav {
     width: 100%;
   }
   
-  .ann-rpd-video {
+  .ann-rpd-video-container {
     height: 50%;
   }
+}
+
+.ann-rpd-video {
+  clip-path: inset(1px 1px);
 }
