@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import Code from '../../CodeBlock';
-import Title from '../../Title';
-import tree_viz from './tree_viz.png';
-import dtree_preds from './dtree_preds.png';
-import path_length_viz from './path_length_viz.png';
-import ensemble_ae from './ensemble_ae.png';
+import React, { Component } from "react";
+import Code from "../../components/CodeBlock";
+import Title from "../../components/Title";
+import tree_viz from "./tree_viz.png";
+import dtree_preds from "./dtree_preds.png";
+import path_length_viz from "./path_length_viz.png";
+import ensemble_ae from "./ensemble_ae.png";
 
 const code1 = `import numpy as np
 from sklearn.tree import DecisionTreeClassifier
@@ -448,90 +448,260 @@ for feature, v1, v2 in zip(cols[mask], sample[mask], adv_sample[mask]):
 
 export default class extends Component {
   render() {
-    return (      
-        <div className='content'>
-          <Title title={this.props.title} date={this.props.date} cat={this.props.cat} />
-          <p>Recently, one of my colleagues asked me if there were any adversarial examples (AEs) against gradientless models such as decision trees. It's a good question: after all, many AE generation techniques rely on gradient-based optimizations of the model's inputs. In the absence of gradients, attacking these types of models becomes an algorithmic optimization challenge rather than a numerical one. This may be easier for programmers without an advanced mathematics background to grok.
+    return (
+      <article className="content">
+        <Title
+          title={this.props.title}
+          date={this.props.date}
+          cat={this.props.cat}
+        />
+        <section>
+          <p>
+            Recently, one of my colleagues asked me if there were any
+            adversarial examples (AEs) against gradientless models such as
+            decision trees. It's a good question: after all, many AE generation
+            techniques rely on gradient-based optimizations of the model's
+            inputs. In the absence of gradients, attacking these types of models
+            becomes an algorithmic optimization challenge rather than a
+            numerical one. This may be easier for programmers without an
+            advanced mathematics background to grok.
           </p>
           <p>
-          We'll choose decision trees as they're interpretable and easy to implement using sklearn. Let's start by fitting some toy data with 4 features <span className='code-block'>f0, f1, f2, f3</span> to three classes <span className='code-block'>c0, c1, c2</span> and visualize how it makes inferences. Our objective is to perturb a sample just enough to get it misclassified.
+            We'll choose decision trees as they're interpretable and easy to
+            implement using sklearn. Let's start by fitting some toy data with 4
+            features <span className="code-block">f0, f1, f2, f3</span> to three
+            classes <span className="code-block">c0, c1, c2</span> and visualize
+            how it makes inferences. Our objective is to perturb a sample just
+            enough to get it misclassified.
           </p>
-          <Code>{code1}</Code>
+        </section>
+        <Code>{code1}</Code>
+        <section>
           <p>
-          Recall that decision trees are simply binary trees whose nodes split according to the value of an instance's feature. To predict a class label for a given instance, we begin at the root node and follow branches determined by feature values until reaching a leaf node representing the predicted outcome. For example, consider the following input: <span className='code-block'>[.9, .2, .5, .3]</span>. Starting from the root node in Figure 1, the following splits are traversed until we reach the purple leaf node at the bottom corresponding to the class <span className='code-block'>c2</span>: <span className='code-block'>f2 {'>'} .45, f1 {'>'} 182, f0 {'<='} .97, f2 {'<='} .882, f2 {'<='} .586, f3 {'<='} .342</span>.
+            Recall that decision trees are simply binary trees whose nodes split
+            according to the value of an instance's feature. To predict a class
+            label for a given instance, we begin at the root node and follow
+            branches determined by feature values until reaching a leaf node
+            representing the predicted outcome. For example, consider the
+            following input:{" "}
+            <span className="code-block">[.9, .2, .5, .3]</span>. Starting from
+            the root node in Figure 1, the following splits are traversed until
+            we reach the purple leaf node at the bottom corresponding to the
+            class <span className="code-block">c2</span>:{" "}
+            <span className="code-block">
+              f2 {">"} .45, f1 {">"} 182, f0 {"<="} .97, f2 {"<="} .882, f2{" "}
+              {"<="} .586, f3 {"<="} .342
+            </span>
+            .
           </p>
-          <Code>{code2}</Code>
-          <div className='image-wrapper-5'>
-            <div className='image-subwrapper'>
-              <img src={tree_viz} />
-            </div>
-            <b>Figure 1: The splits of a decision tree</b>
+        </section>
+        <Code>{code2}</Code>
+        <div className="image-wrapper-5">
+          <div className="image-subwrapper">
+            <img src={tree_viz} alt="The splits of a decision tree" />
           </div>
-          <p>
-            It's a good idea to look under the hood of the model and make sure that this is indeed what's happening inside. Fortunately, sklearn's documentation provides excellent resources to unpack a decision tree into a binary tree <span className='code-block'>Node</span> and trace the path taken by the forward pass.
-          </p>
-          <Code>{code3}</Code>
-          <p>
-          Our goal is to make a slight perturbation to this input's features to get it "misclassified" (or at least, put in a different class). Getting it to be in class <span className='code-block'>c0</span> is actually straightforward: simply changing <span className='code-block'>f3</span> to be slightly greater than <span className='code-block'>.342</span> would change the last split to take the path towards <span className='code-block'>c0</span> instead of <span className='code-block'>c2</span>. Thus, <span className='code-block'>[.9, .2, .5, .342 + 1e-3]</span> is our adversarial example.
-          </p>
-          <Code>{code4}</Code>
-          <p>
-          It's not always this easy, though. What if our target class was <span className='code-block'>c1</span>? Again, we need to change only one feature, in this case, <span className='code-block'>f2</span> to be greater than <span className='code-block'>.882</span>, to change the predicted class to <span className='code-block'>c1</span>. How did we know that it was <span className='code-block'>f2</span> that needed to be changed? Because <span className='code-block'>f2</span> lies on the shortest path between our original class (<span className='code-block'>c2</span>) leaf node and target class leaf node (<span className='code-block'>c0</span>). This path is <span className='code-block'>[f3 {'<='} .342, f2 {'<='} .586, f2 {'<='} .882]</span>. Note that we do not actually need to change the nodes leading up to the highest node in our shortest path. The highest node in our path is <span className='code-block'>f2 {'<='} .882</span>, and the nodes leading up to it are <span className='code-block'>f3 {'<='} .342 and f2 {'<='} .586</span>. This is because the tree makes inferences starting from the root node <span className='code-block'>f2 {'<='} .45</span>, and the path leading to the leaf node <span className='code-block'>c1</span> won't ever need to pass through <span className='code-block'>f3 {'<='} .342 and f2 {'<='} .586</span> anyways.
-          </p>
-          <p>
-          In short, to change the label of an instance, we should find the shortest path between the original class's leaf node and the target class's lead node, prune the nodes in this path leading up to the highest node, and change the remaining features. We can find the shortest path using a Breadth-First Search, using the attributes <span className='code-block'>left</span> and <span className='code-block'>right</span> to denote directions to take when traversing. We'll need to track the highest node as well, so we'll mark it using the attribute <span className='code-block'>parent</span> during our BFS. Finally, once we have our pruned path, we change each feature by either adding or subtracting a small value (<span className='code-block'>1e-3</span> here) depending on whether the direction is <span className='code-block'>left</span> or <span className='code-block'>right</span>.
-          </p>
-          <Code>{code5}</Code>
-          <p>
-          <b>Are these AEs?</b> Not necessarily. These are the smallest perturbations needed to change the label of a sample, but if they're not imperceptible to humans, they aren't AEs. To see how the results look on real data, let's fit the tree on MNIST and create some AEs for the digit 0.
-          </p>
-          <Code>{code6}</Code>
-          <div className='image-wrapper-5'>
-            <div className='image-subwrapper'>
-                <img src={dtree_preds} />
-            </div>
-            <b>Figure 2: 9 adversarial examples for 0</b>
-          </div>
-          <p>
-          They still look like a zeros to me, so they're definitely AEs. Note that we only needed to change about 2 pixels on average to change the label, so this shows how brittle/overfit the decision tree is, despite it having a test accuracy of 88%.
-          </p>
-          <p>
-            We can see why only 2 out of 768 pixels needed to be modified by visualizing the shortest path traversed for an example. In Figure 3, a portion of the decision tree's nodes, note that in the path between the orginal class's leaf node 3354 and the target class's leaf node 3439, only three features actually needed to be changed because there's a very short path of three nodes from the highest node 3213 to the leaf node 3439. In other words, our tree has a high balance factor, making AE generation easy. It appears that minimizing the balance factor of the tree while fitting it may improve its generalization, and this is something worth researching.
-          </p>
-          <Code>{code7}</Code>
-          <div className='image-wrapper-5'>
-            <div className='image-subwrapper'>
-              <img src={path_length_viz} />
-            </div>
-            <b>Figure 3: The effective shortest path</b>
-          </div>
-          <p>
-          <b>What about ensembles?</b> For an ensemble of trees, the results can get quite hairy. Recall that ensembles make predictions by taking the majority vote of the predictions of each of its constituent trees. For each tree, we'd have a small proportion of features to change, and as the number of trees increase, the total number of features to change add up (depending on the diversity of the trees or, equivalently, the intersection of features to change for each tree).
-          </p>
-          <p>
-            Here's a test fitting 100 trees to MNIST. For each tree, we can formulate the features to change and the values they need to be changed to as a constraint. We can then collect the 100 constraints, one for each tree, and solve for the constraints using a solver like Z3.
-          </p>
-          <Code>{code8}</Code>
-          <div className='image-wrapper-5'>
-            <div className='image-subwrapper'>
-              <img src={ensemble_ae} />
-            </div>
-            <b>Figure 4: An adversarial 0 for a tree ensemble</b>
-          </div>
-          <p>
-          Note that this is a greedy approach - we selected the features as per the shortest path for each tree and calculated the intersection of features for all trees - so the results aren't that great. It's possible that there exists a smaller subset of features to change, but this would mean that we'd need to look at each possible path (and not just the shortest path) for each tree. Perhaps finding intersections over the top-k shortest paths for each tree might be computationally feasible?
-          </p>
-          <p>
-          <b>Are these counterfactual explanations?</b> A prominent difference in the AEs generated for decision trees and the AEs generated for gradient-based models is the sparsity: For trees, only a small proportion of features/pixels needed to be changed while for gradient-based models, all the pixels needed to be changed. Consequently, for trees, each of the few pixels changed needed to be changed be a large value, while for gradient-based models, all the pixels needed to be changed by a very small value.
-          </p>
-          <p>
-          The AEs generated for trees seem a bit like <a href='https://link.springer.com/article/10.1007/s11023-021-09580-9'>counterfactual explanations (CEs)</a>. In CEs, we look to make changes to the best possible features to get a sample misclassified. By "best features" here, we mean the features that make the most sense to a human (as opposed to the human-imperceptible changes required for an AE). For example, a CE for the digit 1 might add a C-shaped curve to the top of the 1 so that it gets classified as a 9 and - importantly - looks like a 9 to a human as well.
-          </p>
-          <p>Observe that the pixels changes for CEs are sparse much like AEs for trees and unlike AEs for gradient-based models. Unfortunately, for deep trees involving high-dimensional data like images, the perturbations are <i>too</i> sparse, rendering it imperceptible to humans. However, for lower-dimensional tabular data, perhaps an AE is a CE? Here's a quick test on a loan default dataset where we ask the question "what feature, if changed for an applicant whose loan was denied, would have got his loan approved?". Does the AE make sense? Try it out, look at the results, and decide for yourself.
-          </p>
-          <Code>{code9}</Code>
-          <p>&nbsp;</p>
+          <b>Figure 1: The splits of a decision tree</b>
         </div>
+        <section>
+          <p>
+            It's a good idea to look under the hood of the model and make sure
+            that this is indeed what's happening inside. Fortunately, sklearn's
+            documentation provides excellent resources to unpack a decision tree
+            into a binary tree <span className="code-block">Node</span> and
+            trace the path taken by the forward pass.
+          </p>
+        </section>
+        <Code>{code3}</Code>
+        <section>
+          <p>
+            Our goal is to make a slight perturbation to this input's features
+            to get it "misclassified" (or at least, put in a different class).
+            Getting it to be in class <span className="code-block">c0</span> is
+            actually straightforward: simply changing{" "}
+            <span className="code-block">f3</span> to be slightly greater than{" "}
+            <span className="code-block">.342</span> would change the last split
+            to take the path towards <span className="code-block">c0</span>{" "}
+            instead of <span className="code-block">c2</span>. Thus,{" "}
+            <span className="code-block">[.9, .2, .5, .342 + 1e-3]</span> is our
+            adversarial example.
+          </p>
+        </section>
+        <Code>{code4}</Code>
+        <section>
+          <p>
+            It's not always this easy, though. What if our target class was{" "}
+            <span className="code-block">c1</span>? Again, we need to change
+            only one feature, in this case,{" "}
+            <span className="code-block">f2</span> to be greater than{" "}
+            <span className="code-block">.882</span>, to change the predicted
+            class to <span className="code-block">c1</span>. How did we know
+            that it was <span className="code-block">f2</span> that needed to be
+            changed? Because <span className="code-block">f2</span> lies on the
+            shortest path between our original class (
+            <span className="code-block">c2</span>) leaf node and target class
+            leaf node (<span className="code-block">c0</span>). This path is{" "}
+            <span className="code-block">
+              [f3 {"<="} .342, f2 {"<="} .586, f2 {"<="} .882]
+            </span>
+            . Note that we do not actually need to change the nodes leading up
+            to the highest node in our shortest path. The highest node in our
+            path is <span className="code-block">f2 {"<="} .882</span>, and the
+            nodes leading up to it are{" "}
+            <span className="code-block">
+              f3 {"<="} .342 and f2 {"<="} .586
+            </span>
+            . This is because the tree makes inferences starting from the root
+            node <span className="code-block">f2 {"<="} .45</span>, and the path
+            leading to the leaf node <span className="code-block">c1</span>{" "}
+            won't ever need to pass through{" "}
+            <span className="code-block">
+              f3 {"<="} .342 and f2 {"<="} .586
+            </span>{" "}
+            anyways.
+          </p>
+          <p>
+            In short, to change the label of an instance, we should find the
+            shortest path between the original class's leaf node and the target
+            class's lead node, prune the nodes in this path leading up to the
+            highest node, and change the remaining features. We can find the
+            shortest path using a Breadth-First Search, using the attributes{" "}
+            <span className="code-block">left</span> and{" "}
+            <span className="code-block">right</span> to denote directions to
+            take when traversing. We'll need to track the highest node as well,
+            so we'll mark it using the attribute{" "}
+            <span className="code-block">parent</span> during our BFS. Finally,
+            once we have our pruned path, we change each feature by either
+            adding or subtracting a small value (
+            <span className="code-block">1e-3</span> here) depending on whether
+            the direction is <span className="code-block">left</span> or{" "}
+            <span className="code-block">right</span>.
+          </p>
+        </section>
+        <Code>{code5}</Code>
+        <section>
+          <p>
+            <b>Are these AEs?</b> Not necessarily. These are the smallest
+            perturbations needed to change the label of a sample, but if they're
+            not imperceptible to humans, they aren't AEs. To see how the results
+            look on real data, let's fit the tree on MNIST and create some AEs
+            for the digit 0.
+          </p>
+        </section>
+        <Code>{code6}</Code>
+        <div className="image-wrapper-5">
+          <div className="image-subwrapper">
+            <img src={dtree_preds} alt="Adversarial examples for the digit 0" />
+          </div>
+          <b>Figure 2: Nine adversarial examples for 0</b>
+        </div>
+        <section>
+          <p>
+            They still look like a zeros to me, so they're definitely AEs. Note
+            that we only needed to change about 2 pixels on average to change
+            the label, so this shows how brittle/overfit the decision tree is,
+            despite it having a test accuracy of 88%.
+          </p>
+          <p>
+            We can see why only 2 out of 768 pixels needed to be modified by
+            visualizing the shortest path traversed for an example. In Figure 3,
+            a portion of the decision tree's nodes, note that in the path
+            between the orginal class's leaf node 3354 and the target class's
+            leaf node 3439, only three features actually needed to be changed
+            because there's a very short path of three nodes from the highest
+            node 3213 to the leaf node 3439. In other words, our tree has a high
+            balance factor, making AE generation easy. It appears that
+            minimizing the balance factor of the tree while fitting it may
+            improve its generalization, and this is something worth researching.
+          </p>
+        </section>
+        <Code>{code7}</Code>
+        <div className="image-wrapper-5">
+          <div className="image-subwrapper">
+            <img
+              src={path_length_viz}
+              alt="The effective shortest path to an adversarial example"
+            />
+          </div>
+          <b>Figure 3: The effective shortest path</b>
+        </div>
+        <section>
+          <p>
+            <b>What about ensembles?</b> For an ensemble of trees, the results
+            can get quite hairy. Recall that ensembles make predictions by
+            taking the majority vote of the predictions of each of its
+            constituent trees. For each tree, we'd have a small proportion of
+            features to change, and as the number of trees increase, the total
+            number of features to change add up (depending on the diversity of
+            the trees or, equivalently, the intersection of features to change
+            for each tree).
+          </p>
+          <p>
+            Here's a test fitting 100 trees to MNIST. For each tree, we can
+            formulate the features to change and the values they need to be
+            changed to as a constraint. We can then collect the 100 constraints,
+            one for each tree, and solve for the constraints using a solver like
+            Z3.
+          </p>
+        </section>
+        <Code>{code8}</Code>
+        <div className="image-wrapper-5">
+          <div className="image-subwrapper">
+            <img
+              src={ensemble_ae}
+              alt="An adversarial 0 for an ensemble of trees"
+            />
+          </div>
+          <b>Figure 4: An adversarial 0 for an ensemble of trees</b>
+        </div>
+        <section>
+          <p>
+            Note that this is a greedy approach - we selected the features as
+            per the shortest path for each tree and calculated the intersection
+            of features for all trees - so the results aren't that great. It's
+            possible that there exists a smaller subset of features to change,
+            but this would mean that we'd need to look at each possible path
+            (and not just the shortest path) for each tree. Perhaps finding
+            intersections over the top-k shortest paths for each tree might be
+            computationally feasible?
+          </p>
+          <p>
+            <b>Are these counterfactual explanations?</b> A prominent difference
+            in the AEs generated for decision trees and the AEs generated for
+            gradient-based models is the sparsity: For trees, only a small
+            proportion of features/pixels needed to be changed while for
+            gradient-based models, all the pixels needed to be changed.
+            Consequently, for trees, each of the few pixels changed needed to be
+            changed be a large value, while for gradient-based models, all the
+            pixels needed to be changed by a very small value.
+          </p>
+          <p>
+            The AEs generated for trees seem a bit like{" "}
+            <a href="https://link.springer.com/article/10.1007/s11023-021-09580-9">
+              counterfactual explanations (CEs)
+            </a>
+            . In CEs, we look to make changes to the best possible features to
+            get a sample misclassified. By "best features" here, we mean the
+            features that make the most sense to a human (as opposed to the
+            human-imperceptible changes required for an AE). For example, a CE
+            for the digit 1 might add a C-shaped curve to the top of the 1 so
+            that it gets classified as a 9 and - importantly - looks like a 9 to
+            a human as well.
+          </p>
+          <p>
+            Observe that the pixels changes for CEs are sparse much like AEs for
+            trees and unlike AEs for gradient-based models. Unfortunately, for
+            deep trees involving high-dimensional data like images, the
+            perturbations are <i>too</i> sparse, rendering it imperceptible to
+            humans. However, for lower-dimensional tabular data, perhaps an AE
+            is a CE? Here's a quick test on a loan default dataset where we ask
+            the question "what feature, if changed for an applicant whose loan
+            was denied, would have got his loan approved?". Does the AE make
+            sense? Try it out, look at the results, and decide for yourself.
+          </p>
+        </section>
+        <Code>{code9}</Code>
+        <p>&nbsp;</p>
+      </article>
     );
   }
-};
+}

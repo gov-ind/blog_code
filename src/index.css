@@ -23,12 +23,6 @@
   display: flex;
 }
 
-@media (max-width: 768px) {
-  .category-wrapper {
-    overflow-x: scroll;
-  }
-}
-
 .flex-center {
   display: flex;
   justify-content: center;

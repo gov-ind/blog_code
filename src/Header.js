@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 //import './index.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import { data, getTitle } from './index';
-import { useHistory } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
+import { data, getTitle } from "./index";
+import { useHistory } from "react-router-dom";
 
 let top = -1;
 
@@ -66,10 +66,14 @@ export function Header() {
   const history = useHistory();
 
   return (
-    <div className='header'>
+    <div className="header">
       <nav>
-        <ul className='header-name' onClick={() => history.push('/')}>Home</ul>
-        <ul className='header-name' onClick={() => history.push('./about')}>About</ul>               
+        <ul className="header-name" onClick={() => history.push("/")}>
+          Home
+        </ul>
+        <ul className="header-name" onClick={() => history.push("./about")}>
+          About
+        </ul>
       </nav>
     </div>
   );
