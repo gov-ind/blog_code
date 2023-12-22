@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { Header } from "./Header";
 import BabySign from "./writeups/BabySign/BabySign";
 import Lunch from "./writeups/Lunch/Lunch";
@@ -14,6 +14,7 @@ import OCR from "./writeups/Google/OCR";
 import AdvDTree from "./posts/ae_dtree/AdvDTree";
 import Wasserstein from "./posts/wasserstein_distance/Wasserstein";
 import ANN_1_RPD from "./posts/ann/ANN_1_RPD";
+import AwkSpark from "./posts/awk_vs_spark/AwkSpark";
 
 import "./index.css";
 import Home from "./Home";
@@ -26,6 +27,14 @@ const Wrapper = (Page) => (props) => <Page {...props} />;
 export const data = [
   { Page: Wrapper(Home), route: "/", title: "Home" },
 
+  {
+    Page: Wrapper(AwkSpark),
+    type: "post",
+    route: "/awk_vs_spark",
+    title: "Who needs Spark when there's awk?",
+    cat: ["spark", "awk"],
+    date: "21/12/2023",
+  },
   {
     Page: Wrapper(ANN_1_RPD),
     type: "post",
