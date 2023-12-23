@@ -232,6 +232,7 @@ sys	 0m0.036s
           </pre>
           <p>
             Explanation:
+          </p>
             <ol>
               <li>When <span className="code-block">awk</span> receives a file name as its argument, it executes the code enclosed in curly braces (hereafter referred to as an "action") within single quotes for each line in the input file.
               </li>
@@ -242,7 +243,6 @@ sys	 0m0.036s
               The presence of the built-in <span className="code-block">END</span> token before the curly braces instructs <span className="code-block">awk</span> to execute that action solely for the final line, resulting in the display of the line number of the last line.
               </li>
             </ol>
-          </p>
           <p>
             The Spark counterpart is trivial.
           </p>
@@ -276,6 +276,7 @@ sys	 0m0.048s
           </pre>
           <p>
             Explanation:
+          </p>
             <ol>
               <li>The <span className="code-block">-F</span> flag instructs <span className="code-block">awk</span> to split the file by a comma.</li>
               <li>The first single quote marks the beginning of the specified actions.</li>
@@ -285,7 +286,6 @@ sys	 0m0.048s
               <li>The <span className="code-block">WND</span> asks awk to run the next action after it reads the last line.</li>
               <li>This last action (<span className="code-block">{cmd1}</span>) prints out the accumulated variable <span className="code-block">s</span>.</li>
             </ol>
-          </p>
           <p>
           The Spark counterpart for this is comparitively straightforward and, as it turns out, blazing fast.
           </p>
@@ -327,12 +327,12 @@ sys	 0m0.044s
           </pre>
           <p>
           Explanation:
+          </p>
           <ol>
             <li><span className="code-block">groups</span> is an associative array in <span className="code-block">awk</span></li>
             <li>To each key in <span className="code-block">groups</span>, we aggregate 2 times the second column, the value.</li>
             <li>After <span className="code-block">awk</span> reads the last line (<span className="code-block">END</span>), we loop through <span className="code-block">groups</span> and print the keys and aggregated value.</li>
           </ol>
-          </p>
           <p>
           11 seconds isn't that bad because Spark performs even worse.
           </p>
@@ -418,6 +418,7 @@ sys	 0m2.321s
           </pre>
           <p>
           Explanation:
+          </p>
           <ol>
             <li>I'm passing two files to the first <span className="code-block">awk</span>. The first file is <span className="code-block">data_to_join.csv</span> and the second is <span className="code-block">data_big.csv</span>.</li>
             <li><span className="code-block">FNR</span> is an <span className="code-block">awk</span> built-in, a counter that tracks the line number of the currently processed file (as opposed to <span className="code-block">NR</span>, which is a global counter that tracks the total number of processed lines). If <span className="code-block">NR == FNR</span>, the current line we're reading is from the first file.</li>
@@ -425,7 +426,6 @@ sys	 0m2.321s
             <li>The for loop runs only for the second file's lines. For each line number in <span className="code-block">a</span>, check if the key (from the first file's line) matches the current file's line's key. If it does, print <span className="code-block">b[k]</span>, which is the first file's line's value, and <span className="code-block">$2</span> which is the second file's line's value to stdout.</li>
             <li>The second <span className="code-block">awk</span> receives the comma separated cross-join of the previous <span className="code-block">awk</span> and accumulates the sum of each column to <span className="code-block">s1</span> and <span className="code-block">s2</span> before printing it on <span className="code-block">END</span>.</li>
           </ol>
-          </p>
           <p>
           That was tricky! I would have liked a cleaner way to do this without having to maintain two associative arrays, but this will do for now. The Spark version will be much easier. But first, we need to read the small RDD.
           </p>

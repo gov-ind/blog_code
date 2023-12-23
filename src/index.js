@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { Header } from "./Header";
@@ -21,8 +21,45 @@ import Home from "./Home";
 import About from "./About";
 
 import QDP from "./posts/q_dp/QDP";
+import { getVisitorInfo, setVisitorInfo, getCountry } from "./visitorInfo";
 
-const Wrapper = (Page) => (props) => <Page {...props} />;
+const Wrapper = Page => {
+  const Wrapped = props => {
+    useEffect(() => {
+      const start = new Date();
+
+      return () => {
+        const end = new Date();
+
+        getVisitorInfo().then((data) => {
+          getCountry().then((geoInfo) => {debugger;
+            geoInfo.start = start;
+            geoInfo.end = end;
+            geoInfo.duration = (end - start) / (60 * 60);
+            const pageName = props.title;
+            const existingInfo = data[pageName];
+            if (existingInfo === undefined) {
+              data[pageName] = {
+                count: 1,
+                geoInfo: [geoInfo],
+              };
+            } else {
+              existingInfo["geoInfo"].push(geoInfo);
+              data[pageName] = {
+                count: existingInfo["count"] + 1,
+                geoInfo: existingInfo["geoInfo"],
+              };
+            }
+            setVisitorInfo(data);
+          });
+        });
+      };
+    }, []);
+
+    return <Page {...props} />;
+  }
+  return Wrapped;
+};
 
 export const data = [
   { Page: Wrapper(Home), route: "/", title: "Home" },
