@@ -14,11 +14,11 @@ class Chip extends Component {
 class Item extends Component {
   render() {
     return (
-      <div
+      <Link
+        to={this.props.route}
         className="home-list-item"
-        onClick={() => this.props.history.push(this.props.route)}
       >
-        <li>{this.props.title}</li>
+        {this.props.title}
         <div className="calendar">
           <FontAwesomeIcon icon={faCalendar} className="calendar-icon" />
           <div className="date">{this.props.date}</div>
@@ -28,7 +28,7 @@ class Item extends Component {
             ))}
           </div>
         </div>
-      </div>
+      </Link>
     );
   }
 }

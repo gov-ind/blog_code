@@ -16,7 +16,7 @@ export default (props) => (
   <SyntaxHighlighter
     language="python"
     style={theme}
-    customStyle={style}
+    className="code"
     {...props}
   ></SyntaxHighlighter>
 );

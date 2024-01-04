@@ -11,6 +11,20 @@
   outline: 1px solid #3b4d61;
 }
 
+pre::-webkit-scrollbar {
+  display: none;
+}
+
+pre::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+
+pre::-webkit-scrollbar-thumb {
+  background-color: #3b4d61;
+  outline: 1px solid #3b4d61;
+  padding-left: 1em;
+}
+
 .m-r-7 {
   margin-right: 7em;
 }
@@ -157,6 +171,23 @@
     border-radius: 5px;
     padding: 1em;
     overflow-x: auto;
+}
+
+.box-bottom {
+  border: solid 1px #3b4d61;
+  border-radius: 0px 0px 5px 5px;
+  padding: 1em;
+  overflow-x: auto;
+  margin-top: 0;
+}
+
+.warning-box {
+  color: black;
+  background: #ffe382; /*#fdff9d; #ab2323;*/
+  border: #ffe382;
+  border-radius: 5px;
+  padding: 1em;
+  overflow-x: auto;
 }
 
 .code-block {
@@ -733,4 +764,20 @@ nav {
 
 .ann-rpd-sidepanel {
   overflow: auto;
+}
+
+.code {
+  background-color: #3b4d61 !important;
+  padding: 1.5em !important;
+  border-radius: 5px;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.code-top {
+  background-color: #3b4d61 !important;
+  padding: 1.5em !important;
+  border-radius: 5px 5px 0px 0px;
+  margin-top: 2em;
+  margin-bottom: 0em;
 }

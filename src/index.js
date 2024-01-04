@@ -15,6 +15,7 @@ import AdvDTree from "./posts/ae_dtree/AdvDTree";
 import Wasserstein from "./posts/wasserstein_distance/Wasserstein";
 import ANN_1_RPD from "./posts/ann/ANN_1_RPD";
 import AwkSpark from "./posts/awk_vs_spark/AwkSpark";
+import TLS from "./posts/tls_under_the_hood/TLS";
 
 import "./index.css";
 import Home from "./Home";
@@ -32,7 +33,7 @@ const Wrapper = Page => {
         const end = new Date();
 
         getVisitorInfo().then((data) => {
-          getCountry().then((geoInfo) => {debugger;
+          getCountry().then((geoInfo) => {
             geoInfo.start = start;
             geoInfo.end = end;
             geoInfo.duration = (end - start) / (60 * 60);
@@ -64,6 +65,14 @@ const Wrapper = Page => {
 export const data = [
   { Page: Wrapper(Home), route: "/", title: "Home" },
 
+  {
+    Page: Wrapper(TLS),
+    type: "post",
+    route: "/tls_under_the_hood",
+    title: "TLS: Under The Hood",
+    cat: ["security", "tls"],
+    date: "02/01/2024",
+  },
   {
     Page: Wrapper(AwkSpark),
     type: "post",
@@ -204,7 +213,7 @@ class App extends Component {
 
   render() {
     return (
-      <Router>
+      <Router hashType="noslash">
         <div className="wrapper">
           <Header title={this.state.title} />
           <div
