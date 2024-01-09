@@ -195,8 +195,9 @@ export default class extends Component {
           </p>
         </section>
         <section>
+          <h1 className="space">Section 0: Setup</h1>
           <p>
-            <b>Setup.</b> We'll start by installing some essential libraries and importing them. We'll also create a <span className="code-block">SparkContext</span> as we'll be dealing with RDDs, not DataFrames.
+            We'll start by installing some essential libraries and importing them. We'll also create a <span className="code-block">SparkContext</span> as we'll be dealing with RDDs, not DataFrames.
           </p>
           <Code>{code1}</Code>
           <p>
@@ -204,16 +205,17 @@ export default class extends Component {
           </p>
           <Code>{code2}</Code>
           <p>
-          <b>The data.</b> Our skewed data is a simple key-value pair consisting of two keys, either 0 or 1, and a value ranging between 0 and 100. The data is skewed towards key 1, which has 32 million records (as opposed to the single record in key 0). In all we have 32000001 keys and 32000001 values, giving us a total of 64000002 integers. If each integer is packed as a long (even though it can be stored as a byte in our case), the total data size is <Tex>32000001 \cdot 2 \cdot 8 / (1024^2) \approx 488</Tex> MB, which isn't quite "big data".
+          Our skewed data is a simple key-value pair consisting of two keys, either 0 or 1, and a value ranging between 0 and 100. The data is skewed towards key 1, which has 32 million records (as opposed to the single record in key 0). In all we have 32000001 keys and 32000001 values, giving us a total of 64000002 integers. If each integer is packed as a long (even though it can be stored as a byte in our case), the total data size is <Tex>32000001 \cdot 2 \cdot 8 / (1024^2) \approx 488</Tex> MB, which isn't quite "big data".
           </p>
           <Code>{code3}</Code>
         </section>
         <section>
+          <h1 className="space">Round 1: Line Count</h1>
           <p>
-          <b>Round 1: Line Count. </b> A simple task: count the number of records. Of course, this can be done in Bash using <span className="code-block">wc</span> but let's use <span className="code-block">awk</span>.
+            A simple task: count the number of records. Of course, this can be done in Bash using <span className="code-block">wc</span> but let's use <span className="code-block">awk</span>.
           </p>
-          <Code>{code4}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code4}</Code>
+          <pre className="box-bottom">
           32000001
           <br />
 real	0m0.136s
@@ -246,26 +248,27 @@ sys	 0m0.036s
           <p>
             The Spark counterpart is trivial.
           </p>
-          <Code>{code5}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code5}</Code>
+          <pre className="box-bottom">
             32000001<br/>
 4.91 s ± 47.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
           </pre>
           <p>
           At first glance, <span className="code-block">awk</span>, at under 3 seconds, is much faster than Spark, which took about 5 seconds. However, <span className="code-block">rdd.count</span> doesn't solely calculate the count for the RDD; it triggers the execution of the entire Directed Acyclic Graph (DAG), specifically <span className="code-block">sc.textFile(file_name, n_cores).map(lambda a: a.split(",")).map(lambda a: (int(a[0]), (int(a[1]),))).count()</span>. To mitigate this, we can optimize performance by caching the intermediate RDD in Spark's executor memory, preventing the need for re-evaluating the DAG with each invocation. This optimization results in a notable reduction in Spark's execution time, now accomplished in just 1 second.
           </p>
-          <Code>{code6}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code6}</Code>
+          <pre className="box-bottom">
           32000001<br/>
 918 ms ± 23 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
           </pre>
           <p><b>Round 1 Winner: Spark</b></p>
         </section>
         <section>
-          <p><b>Round 2: Narrow Transformations. </b>Let's consider a standard map-reduce operation: Square all the even values and sum them. Here's how to <span className="code-block">awk</span> it:
+          <h1 className="space">Round 2: Narrow Transformations</h1>
+          <p>Let's consider a standard map-reduce operation: Square all the even values and sum them. Here's how to <span className="code-block">awk</span> it:
           </p>
-          <Code>{code7}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code7}</Code>
+          <pre className="box-bottom">
           51714956044
           <br />
 real	0m11.573s
@@ -283,14 +286,14 @@ sys	 0m0.048s
               <li>The first curly brace indicates the start of the first action.</li>
               <li>The <span className="code-block">if ($2 % 2 == 0)</span> checks if the second column (split by the comma) is even.</li>
               <li>The <span className="code-block">s += $2 ** 2</span> accumulates the square of current column value to the variable <span className="code-block">s</span>.</li>
-              <li>The <span className="code-block">WND</span> asks awk to run the next action after it reads the last line.</li>
+              <li>The <span className="code-block">WND</span> asks <span className="code-block">awk</span> to run the next action after it reads the last line.</li>
               <li>This last action (<span className="code-block">{cmd1}</span>) prints out the accumulated variable <span className="code-block">s</span>.</li>
             </ol>
           <p>
-          The Spark counterpart for this is comparitively straightforward and, as it turns out, blazing fast.
+          The Spark counterpart for this is comparatively straightforward and, as it turns out, blazing fast.
           </p>
-          <Code>{code8}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code8}</Code>
+          <pre className="box-bottom">
           51714956044<br/>
 1.82 s ± 17.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
           </pre>
@@ -311,10 +314,11 @@ sys	 0m0.048s
           <p><b>Round 2 Winner: Spark</b></p>
         </section>
         <section>
-          <p><b>Round 3: Wide transformations.</b> Since our data is skewed, we expect a group by key and sum aggregate to be really slow for both <span className="code-block">awk</span> and Spark. Let's confirm.
+          <h1 className="space">Round 3: Wide Transformations</h1>
+          <p>Since our data is skewed, we expect a group by key and sum aggregate to be really slow for both <span className="code-block">awk</span> and Spark. Let's confirm.
           </p>
-          <Code>{code9}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code9}</Code>
+          <pre className="box-bottom">
           0,156
           <br />
 1,3167802282
@@ -336,8 +340,8 @@ sys	 0m0.044s
           <p>
           11 seconds isn't that bad because Spark performs even worse.
           </p>
-          <Code>{code10}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code10}</Code>
+          <pre className="box-bottom">
           [156, 3167802282]<br/>
 1min 18s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
           </pre>
@@ -354,8 +358,8 @@ sys	 0m0.044s
           <p>
           Spark puts each group's values in a partition. There are two groups, and so there are two partitions. The problem is that the second key has 32 million records (that are in one partition), so they will be processed in a single core and we don't get any concurrency. Of course, we could just reduce by the key, but that wouldn't be fair.
           </p>
-          <Code>{code12}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code12}</Code>
+          <pre className="box-bottom">
           [156, 3167802282]<br/>
 2.17 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
           </pre>
@@ -372,14 +376,14 @@ sys	 0m0.044s
           <p>
           Notice the effect of salting: each partition now contains approximately 2 million rows, and the number of records within each partition is balanced. This configuration enables Spark to effectively parallelize operations on individual partitions. However, upon collecting results, the outcome is dispersed across the salted groups. For instance, the aggregate for key <span className="code-block">1</span> is distributed among salted keys <span className="code-block">1_0</span>, <span className="code-block">1_1</span>, and so forth up to <span className="code-block">1_15</span>. To derive the aggregate for key <span className="code-block">1</span>, it suffices to sum the aggregates of each corresponding salted key.
           </p>
-          <Code>{code14}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code14}</Code>
+          <pre className="box-bottom">
           {'{'}'1': 3167802282, '0': 156{'}'}
           <br />
 7.3 s ± 232 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
           </pre>
           <p>
-          At 7 seconds, this is already much faster than <span className="code-block">awk</span>, but we can do better. Observe from Figure 3 that each partition has a number of different groups. This means that when aggregating results for a single group, results from other partitions would need to transportated across partitions (an operation called a shuffle) and aggregated once again. What if we repartition our RDD so that all values belonging to a group go into the same partition? For instance, keys <span className="code-block">0_0</span> and <span className="code-block">1_0</span> could go in partition 0, keys <span className="code-block">0_1</span> and <span className="code-block">1_1</span> could go in partition 1, and so on. This way, we expect to reduce shuffles and reduce the compute time even further.
+          At 7 seconds, this is already much faster than <span className="code-block">awk</span>, but we can do better. Observe from Figure 3 that each partition has a number of different groups. This means that when aggregating results for a single group, results from other partitions would need to transported across partitions (an operation called a shuffle) and aggregated once again. What if we repartition our RDD so that all values belonging to a group go into the same partition? For instance, keys <span className="code-block">0_0</span> and <span className="code-block">1_0</span> could go in partition 0, keys <span className="code-block">0_1</span> and <span className="code-block">1_1</span> could go in partition 1, and so on. This way, we expect to reduce shuffles and reduce the compute time even further.
           </p>
           <Code>{code15}</Code>
           <div className="image-wrapper-5">
@@ -388,8 +392,8 @@ sys	 0m0.044s
             </div>
             <b>Figure 4: The partitions for a group-by transformation after salting and repartitioning</b>
           </div>
-          <Code>{code16}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code16}</Code>
+          <pre className="box-bottom">
           {'{'}'1': 3167802282, '0': 156{'}'}
           <br />
 4.22 s ± 78.8 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
@@ -400,14 +404,15 @@ sys	 0m0.044s
           <p><b>Round 3 Winner: Spark</b></p>
         </section>
         <section>
-          <p><b>Round 4: Cross-Joins. </b>For the final round, we'll attempt to join a tiny CSV containing 9 records with our big CSV and sum each column of the joined dataset. In the tiny CSV, 8 records will have the key <span className="code-block">1</span> and the other record will have key <span className="code-block">2</span>. Since the matching key between the two CSVs is key <span className="code-block">1</span>, we expect the cross join to have <Tex>32000000 \cdot 8</Tex> records.
+          <h1 className="space">Round 4: Cross Joins</h1>
+          <p>For the final round, we'll attempt to join a tiny CSV containing 9 records with our big CSV and sum each column of the joined dataset. In the tiny CSV, 8 records will have the key <span className="code-block">1</span> and the other record will have key <span className="code-block">2</span>. Since the matching key between the two CSVs is key <span className="code-block">1</span>, we expect the cross join to have <Tex>32000000 \cdot 8</Tex> records.
           </p>
           <Code>{code17}</Code>
           <p>
           The <span className="code-block">awk</span> program to do a this is quite involved, but here it is.
           </p>
-          <Code>{code18}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code18}</Code>
+          <pre className="box-bottom">
           15648000000,12671209128
           <br />
 real	1m40.685s
@@ -433,8 +438,8 @@ sys	 0m2.321s
           <p>
           A quick note: I'm flattening the values in my big RDD (they used to be tuples previously) so that the joins are slightly better to work with.
           </p>
-          <Code>{code20}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code20}</Code>
+          <pre className="box-bottom">
           [(1, (12671209128, 15648000000))]
           <br />
 4min 2s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
@@ -466,11 +471,11 @@ sys	 0m2.321s
             <div className="image-subwrapper">
               <img src={partitions_salted_small_rdd} alt="The partitions of the salted small RDD in a cross-join" />
             </div>
-            <b>Figure 6: The partitions of the salted small RDD in a cross-join</b>
+            <b>Figure 7: The partitions of the salted small RDD in a cross-join</b>
           </div>
           <p>Since our keys are salted, we'll have to aggregate manually as before.</p>
-          <Code>{code23}</Code>
-          <pre className="space box">
+          <Code className="code-top">{code23}</Code>
+          <pre className="box-bottom">
           {'{'}1: [12671209128, 15648000000]{'}'}
           <br />
 15.2 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
@@ -480,7 +485,8 @@ sys	 0m2.321s
           </p>
         </section>
         <section>
-          <b>Conclusion. </b><span className="code-block">awk</span> is a fantastic tool and that's surprisingly good at data-driven workloads. But in the end, it's no match for an optimized Spark. The message, then, is clear: If you've got skewed data and don't know how to tune Spark, stick to <span className="code-block">awk</span> for your ML projects.
+          <h1 className="space">Conclusion</h1>
+          <span className="code-block">awk</span> is a fantastic tool and that's surprisingly good at data-driven workloads. But in the end, it's no match for an optimized Spark. The message, then, is clear: If you've got skewed data and don't know how to tune Spark, stick to <span className="code-block">awk</span> for your ML projects.
         </section>
         <p>&nbsp;</p>
       </article>

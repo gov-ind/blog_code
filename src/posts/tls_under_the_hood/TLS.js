@@ -447,7 +447,7 @@ export default class extends Component {
         <section>
           <h1 className="space">Section 1: HTTP Traffic Capture</h1>
           <p>
-            Before sending a request from Alice to Bob, let's start a packet capture on e<span class="code-block">eth0</span> in the Ubuntu container.
+            Before sending a request from Alice to Bob, let's start a packet capture on <span class="code-block">eth0</span> in the Ubuntu container.
           </p>
           <Code>{code5}</Code>
           <p>

@@ -77,7 +77,7 @@ export const data = [
     Page: Wrapper(AwkSpark),
     type: "post",
     route: "/awk_vs_spark",
-    title: "Who needs Spark when there's awk?",
+    title: "Who Needs Spark When There's awk?",
     cat: ["spark", "awk"],
     date: "21/12/2023",
   },
